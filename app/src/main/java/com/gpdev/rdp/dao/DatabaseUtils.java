@@ -14,9 +14,9 @@ public class DatabaseUtils {
 
     /** Create new database if not present */
     public static void copyExistingDatabase(String name) {
-        if (databaseExists(name)) {
-            return;
-        }
+       // if (databaseExists(name)) {
+       //     return;
+       // }
 
         copyDataBase(name);
     }

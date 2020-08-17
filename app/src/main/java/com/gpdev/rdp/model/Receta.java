@@ -80,6 +80,11 @@ public class Receta implements ElementoListable {
         return Collections.emptyList();
     }
 
+    @Override
+    public RecetarioType getType() {
+        return RecetarioType.RECETA;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

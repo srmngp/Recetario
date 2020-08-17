@@ -23,10 +23,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.gpdev.rdp.view.activity.RecetaListActivity" />
         </activity>
-        <activity
-            android:name=".view.activity.ScrollingActivity"
-            android:label="@string/title_activity_scrolling"
-            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".view.activity.ListaRecetasActivity" />
         <activity android:name=".view.activity.ListadoActivity" />
         <activity android:name=".view.activity.MainActivity">

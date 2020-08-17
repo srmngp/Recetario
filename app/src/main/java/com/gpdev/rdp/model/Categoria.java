@@ -75,6 +75,11 @@ public class Categoria implements ElementoListable {
         return getRecetas();
     }
 
+    @Override
+    public RecetarioType getType() {
+        return RecetarioType.CATEGORIA;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

@@ -16,6 +16,10 @@ import androidx.appcompat.app.ActionBar;
 import android.view.MenuItem;
 
 import com.gpdev.rdp.R;
+import com.gpdev.rdp.model.Receta;
+import com.gpdev.rdp.view.adapter.ElementoListable;
+
+import java.io.Serializable;
 
 /**
  * An activity representing a single Receta detail screen. This
@@ -25,14 +29,17 @@ import com.gpdev.rdp.R;
  */
 public class RecetaDetailActivity extends AppCompatActivity {
 
+    public static final String PARENT = "parent"; //TODO usar una clase común para estos valores?
+    private Receta receta;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receta_detail);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+        Toolbar toolbar = findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,13 +67,15 @@ public class RecetaDetailActivity extends AppCompatActivity {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putString(RecetaDetailFragment.ARG_ITEM_ID,
-                    getIntent().getStringExtra(RecetaDetailFragment.ARG_ITEM_ID));
+            receta = (Receta) getIntent().getSerializableExtra(RecetaDetailFragment.ARG_ITEM);
+            arguments.putSerializable(RecetaDetailFragment.ARG_ITEM, receta);
+
             RecetaDetailFragment fragment = new RecetaDetailFragment();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.receta_detail_container, fragment)
                     .commit();
+            setTitle(receta.getTitle());
         }
     }
 
@@ -74,15 +83,10 @@ public class RecetaDetailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            // This ID represents the Home or Up button. In the case of this
-            // activity, the Up button is shown. For
-            // more details, see the Navigation pattern on Android Design:
-            //
-            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
-            //
-            navigateUpTo(new Intent(this, RecetaListActivity.class));
+            onBackPressed();
             return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 }

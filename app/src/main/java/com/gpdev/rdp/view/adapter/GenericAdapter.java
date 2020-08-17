@@ -16,37 +16,37 @@ public class GenericAdapter<T extends ElementoListable> extends BaseAdapter {
     Context context;
     LayoutInflater layoutInflater;
 
-    List<T> recetaList;
+    List<T> elementList;
 
-    public GenericAdapter(Context cont, List<T> userL) {
+    public GenericAdapter(Context cont, List<T> elementList) {
         super();
         this.context = cont;
-        this.recetaList = userL;
+        this.elementList = elementList;
     }
 
     @Override
     public int getCount() {
-        return recetaList.size();
+        return elementList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return recetaList.get(position);
+        return elementList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return recetaList.get(position).getId();
+        return elementList.get(position).getId();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        T receta = recetaList.get(position);
+        T element = elementList.get(position);
         layoutInflater = LayoutInflater.from(context);
 
         View view = layoutInflater.inflate(R.layout.lista_item, null);
         TextView titleTextView = (TextView) view.findViewById(R.id.nombreTextView);
-        titleTextView.setText(receta.getTitle());
+        titleTextView.setText(element.getTitle());
 
         return view;
     }

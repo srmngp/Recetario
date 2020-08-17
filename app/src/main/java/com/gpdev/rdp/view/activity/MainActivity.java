@@ -30,13 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 goToDetail(RecetarioType.CATEGORIA);
                 break;
 
-            case R.id.scroll:
-                intent = new Intent(MainActivity.this, ScrollingActivity.class);
-                startActivity(intent);
-                break;
-
             case R.id.masterDetail:
                 intent = new Intent(MainActivity.this, RecetaListActivity.class);
+                intent.putExtra(getString(R.string.ELEMENTO_SELECCIONADO), RecetarioType.CATEGORIA);
                 startActivity(intent);
                 break;
 
