@@ -1,22 +1,27 @@
 package com.gpdev.rdp.dao;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 
+import com.gpdev.rdp.App;
 import com.gpdev.rdp.AppUtils;
 import com.gpdev.rdp.R;
 
 import de.greenrobot.common.io.FileUtils;
 
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
+
 public class DatabaseUtils {
 
     /** Create new database if not present */
     public static void copyExistingDatabase(String name) {
-       // if (databaseExists(name)) {
-       //     return;
-       // }
+       if (databaseExists(name)) {
+            return;
+       }
 
         copyDataBase(name);
     }
@@ -40,13 +45,16 @@ public class DatabaseUtils {
     /**
      * Copy existing database file in system
      */
-    private static void copyDataBase(String name) {
+    private static void copyDataBase(String databaseName) {
 
         String destinyPath = AppUtils.extractString(R.string.DB_DESTINY_PATH);
-        String resourcePath = AppUtils.extractString(R.string.DB_RESOURCE_PATH) + AppUtils.extractString(R.string.DB_RESOURCE_NAME);
+        File destinationFile = new File(destinyPath + databaseName);
+
+        String resourcePath = AppUtils.extractString(R.string.DB_RESOURCE_NAME);
 
         try {
-            FileUtils.copyFile(resourcePath, destinyPath);
+            InputStream databaseInputStream = App.getContext().getAssets().open(resourcePath);
+            copyInputStreamToFile(databaseInputStream, destinationFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
