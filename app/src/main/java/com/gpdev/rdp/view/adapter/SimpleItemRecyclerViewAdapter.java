@@ -2,30 +2,33 @@ package com.gpdev.rdp.view.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.gpdev.rdp.R;
 import com.gpdev.rdp.view.activity.RecetaDetailActivity;
 import com.gpdev.rdp.view.activity.RecetaDetailFragment;
 import com.gpdev.rdp.view.activity.RecetaListActivity;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
+public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> implements Filterable {
 
     private final RecetaListActivity mParentActivity;
-    private final List<ElementoListable> mValues;
+    private final List<ElementoListable> elementList;
+    private List<ElementoListable> filteredElementList;
 
     public SimpleItemRecyclerViewAdapter(RecetaListActivity parent, List<ElementoListable> items) {
-        mValues = items;
+        elementList = items;
+        filteredElementList = items;
         mParentActivity = parent;
     }
 
@@ -38,16 +41,16 @@ public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleIt
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mIdView.setText(mValues.get(position).getId().toString());
-        holder.mContentView.setText(mValues.get(position).getTitle());
+        holder.mIdView.setText(filteredElementList.get(position).getId().toString());
+        holder.mContentView.setText(filteredElementList.get(position).getTitle());
 
-        holder.itemView.setTag(mValues.get(position));
+        holder.itemView.setTag(filteredElementList.get(position));
         holder.itemView.setOnClickListener(buildOnClickListener(position));
     }
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return elementList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -61,12 +64,42 @@ public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleIt
         }
     }
 
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(final CharSequence charSequence) {
+                final String charString = charSequence.toString();
+                FilterResults filterResults = new FilterResults();
+
+                if (charString.isEmpty()) {
+                    filteredElementList = elementList;
+                    return filterResults;
+                }
+
+                filteredElementList = elementList.stream()
+                        .filter(e -> e.getTitle().toLowerCase().contains(charString.toLowerCase()))
+                        .collect(Collectors.toList());
+
+                filterResults.values = filteredElementList;
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                filteredElementList = (ArrayList<ElementoListable>) filterResults.values;
+
+                notifyDataSetChanged();
+            }
+        };
+    }
+
     private View.OnClickListener buildOnClickListener(final int position) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Context context = view.getContext();
-                ElementoListable item = mValues.get(position);
+                ElementoListable item = elementList.get(position);
 
                 if (item.isParent()){
                      Intent intent = new Intent(mParentActivity.getBaseContext(), RecetaListActivity.class);

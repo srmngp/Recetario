@@ -12,8 +12,11 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 
 import com.gpdev.rdp.App;
 import com.gpdev.rdp.R;
@@ -44,12 +47,15 @@ public class RecetaListActivity extends AppCompatActivity {
     public static final String ARG_ITEM = "item"; //TODO usar una clase común para estos valores?
 
     private EnumMap<RecetarioType, AbstractDao> daoMap;
+    private Toolbar toolbar;
+    private RecyclerView recyclerView;
+    private EditText filterEditText;
+    private SimpleItemRecyclerViewAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receta_list);
-        setTitle(R.string.categorias_title);
 
         buildDaoMap();
 
@@ -77,29 +83,35 @@ public class RecetaListActivity extends AppCompatActivity {
     }
 
     private void initViewComponents() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        setupListView();
+
+        filterEditText = findViewById(R.id.filterListEditText);
+        filterEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int before, int count) {
+                adapter.getFilter().filter(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
             }
         });
-
-        setupListView();
     }
 
     private void setupListView( ) {
-        RecyclerView recyclerView = findViewById(R.id.receta_list);
+        recyclerView = findViewById(R.id.receta_list);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
@@ -108,14 +120,18 @@ public class RecetaListActivity extends AppCompatActivity {
 
         RecetarioType typeSelected = (RecetarioType) bundle.get(getString(R.string.ELEMENTO_SELECCIONADO));
         if (typeSelected != null) {
-            recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(RecetaListActivity.this, daoMap.get(typeSelected).loadAll()));
+            adapter = new SimpleItemRecyclerViewAdapter(RecetaListActivity.this, daoMap.get(typeSelected).loadAll());
+            recyclerView.setAdapter(adapter);
+            setTitle(typeSelected.getLabel());
             return;
         }
 
         ElementoListable elementSelected = (ElementoListable) bundle.get(RecetaDetailFragment.ARG_ITEM);
         if (elementSelected != null) {
             setTitle(elementSelected.getTitle());
-            recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(this, getChildren(elementSelected)));
+            adapter = new SimpleItemRecyclerViewAdapter(this, getChildren(elementSelected));
+            recyclerView.setAdapter(adapter);
+            setTitle(elementSelected.getTitle());
             return;
         }
     }

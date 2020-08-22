@@ -11,5 +11,7 @@
     <string name="title_receta_list">Recetas</string>
     <string name="title_receta_detail">Receta Detail very largo texto myy largos isi</string>
     <string name="categorias_title">Categorias</string>
+    <string name="ingredients_label">Ingredientes</string>
+    <string name="preparation_label">Preparación</string>
 
 </resources>

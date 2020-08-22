@@ -1,10 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/receta_detail"
-    style="?android:attr/textAppearanceLarge"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp"
-    android:textIsSelectable="true"
-    tools:context=".view.activity.RecetaDetailFragment" />
+    tools:context=".view.activity.RecetaDetailFragment"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/receta_ingredients_label"
+            style="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"
+            android:textColor="@color/cardview_dark_background"
+            android:padding="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/ingredients_label"
+            android:textIsSelectable="false" />
+
+        <TextView
+            android:id="@+id/receta_ingredients"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <TextView
+            android:id="@+id/receta_preparation_label"
+            style="?android:attr/textAppearanceLarge"
+            android:textStyle="bold"
+            android:textColor="@color/cardview_dark_background"
+            android:padding="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/preparation_label"
+            android:textIsSelectable="false" />
+
+        <TextView
+            android:id="@+id/receta_preparation"
+            style="?android:attr/textAppearanceLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textIsSelectable="false"
+            tools:text="@tools:sample/lorem" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
