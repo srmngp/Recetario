@@ -1,20 +1,21 @@
 package com.gpdev.rdp.model;
 
+import com.gpdev.rdp.dao.CategoriaDao;
+import com.gpdev.rdp.dao.DaoSession;
+import com.gpdev.rdp.dao.RecetaDao;
 import com.gpdev.rdp.view.adapter.ElementoListable;
 
+import org.greenrobot.greendao.DaoException;
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.OrderBy;
 import org.greenrobot.greendao.annotation.Property;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.ToMany;
+import org.greenrobot.greendao.annotation.ToOne;
 
-import java.io.Serializable;
 import java.util.List;
-import org.greenrobot.greendao.DaoException;
-import com.gpdev.rdp.dao.DaoSession;
-import com.gpdev.rdp.dao.RecetaDao;
-import com.gpdev.rdp.dao.CategoriaDao;
+import com.gpdev.rdp.dao.PlatoDao;
 
 @Entity(nameInDb = "CATEGORIAS", createInDb = false)
 public class Categoria implements ElementoListable {
@@ -27,11 +28,14 @@ public class Categoria implements ElementoListable {
     private String nombre;
 
     @Property(nameInDb = "ID_PLATO")
-    private String plato;
+    private Long idPlato;
 
     @ToMany(referencedJoinProperty = "idCategoria")
     @OrderBy("nombre ASC")
     private List<Receta> recetas;
+
+    @ToOne(joinProperty = "idPlato")
+    private Plato plato;
 
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
@@ -41,11 +45,14 @@ public class Categoria implements ElementoListable {
     @Generated(hash = 1170305099)
     private transient CategoriaDao myDao;
 
-    @Generated(hash = 1214509889)
-    public Categoria(Long id, String nombre, String plato) {
+    @Generated(hash = 798145557)
+    private transient Long plato__resolvedKey;
+
+    @Generated(hash = 636314582)
+    public Categoria(Long id, String nombre, Long idPlato) {
         this.id = id;
         this.nombre = nombre;
-        this.plato = plato;
+        this.idPlato = idPlato;
     }
 
     @Generated(hash = 577285458)
@@ -92,12 +99,12 @@ public class Categoria implements ElementoListable {
         this.nombre = nombre;
     }
 
-    public String getPlato() {
-        return this.plato;
+    public Long getIdPlato() {
+        return this.idPlato;
     }
 
-    public void setPlato(String plato) {
-        this.plato = plato;
+    public void setIdPlato(Long idPlato) {
+        this.idPlato = idPlato;
     }
 
     /**
@@ -169,6 +176,35 @@ public class Categoria implements ElementoListable {
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getCategoriaDao() : null;
+    }
+
+    /** To-one relationship, resolved on first access. */
+    @Generated(hash = 932251344)
+    public Plato getPlato() {
+        Long __key = this.idPlato;
+        if (plato__resolvedKey == null || !plato__resolvedKey.equals(__key)) {
+            final DaoSession daoSession = this.daoSession;
+            if (daoSession == null) {
+                throw new DaoException("Entity is detached from DAO context");
+            }
+            PlatoDao targetDao = daoSession.getPlatoDao();
+            Plato platoNew = targetDao.load(__key);
+            synchronized (this) {
+                plato = platoNew;
+                plato__resolvedKey = __key;
+            }
+        }
+        return plato;
+    }
+
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 1795268747)
+    public void setPlato(Plato plato) {
+        synchronized (this) {
+            this.plato = plato;
+            idPlato = plato == null ? null : plato.getId();
+            plato__resolvedKey = idPlato;
+        }
     }
 
 }

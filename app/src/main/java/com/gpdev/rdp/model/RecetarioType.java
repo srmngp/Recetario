@@ -2,31 +2,24 @@ package com.gpdev.rdp.model;
 
 public enum RecetarioType {
 
-    PLATO(true, "Platos"),
-    CATEGORIA(true, "Categorias"),
-    RECETA(false, "Recetas");
+    RECETA("Recetas"),
+    CATEGORIA("Categorías"),
+    PLATO("Platos"),
+    OTRO("Otros");
 
     private boolean parent;
-    private String label;
+    private String descripcion;
 
-    RecetarioType(boolean parent, String label) {
-        this.parent = parent;
-        this.label = label;
+    RecetarioType(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
     }
 
     public boolean isParent() {
         return parent;
     }
 
-    public void setParent(boolean parent) {
-        this.parent = parent;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
 }

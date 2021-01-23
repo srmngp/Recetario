@@ -3,7 +3,6 @@ package com.gpdev.rdp.dao;
 import org.greenrobot.greendao.test.AbstractDaoTestLongPk;
 
 import com.gpdev.rdp.model.Categoria;
-import com.gpdev.rdp.dao.CategoriaDao;
 
 public class CategoriaTest extends AbstractDaoTestLongPk<CategoriaDao, Categoria> {
 

@@ -2,17 +2,18 @@ package com.gpdev.rdp.view.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+
+import androidx.fragment.app.Fragment;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.fragment.app.Fragment;
-
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.gpdev.rdp.R;
 import com.gpdev.rdp.model.Receta;
-import com.gpdev.rdp.view.adapter.ElementoListable;
 
 /**
  * A fragment representing a single Receta detail screen.
@@ -24,17 +25,7 @@ public class RecetaDetailFragment extends Fragment {
 
     public static final String ARG_ITEM = "item";
 
-    /**
-     * The dummy content this fragment is presenting.
-     */
     private Receta receta;
-
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public RecetaDetailFragment() {
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,13 +47,12 @@ public class RecetaDetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.receta_detail, container, false);
 
-        if (receta == null) {
-            return rootView;
+        if (receta != null) {
+            ((TextView) rootView.findViewById(R.id.recipe_ingredients)).setText(receta.getIngredientes());
+            ((TextView) rootView.findViewById(R.id.recipe_preparation)).setText(receta.getPreparacion());
         }
-
-        ((TextView) rootView.findViewById(R.id.receta_ingredients)).setText(receta.getIngredientes());
-        ((TextView) rootView.findViewById(R.id.receta_preparation)).setText(receta.getPreparacion());
 
         return rootView;
     }
+
 }

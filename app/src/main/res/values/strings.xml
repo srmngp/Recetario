@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Recetas de Paqui</string>
 
-    <string name="DB_NAME">"Recetario2.sqlite"</string>
+    <string name="DB_NAME">"Recetario5.sqlite"</string>
     <string name="DB_DESTINY_PATH">"/data/data/com.gpdev.rdp/databases/"</string>
     <string name="DB_RESOURCE_PATH">"databases/"</string>
     <string name="DB_RESOURCE_NAME">"Recetario.sqlite"</string>
@@ -13,5 +13,9 @@
     <string name="categorias_title">Categorias</string>
     <string name="ingredients_label">Ingredientes</string>
     <string name="preparation_label">Preparación</string>
+    <string name="main_listaRecetasBtn" >Recetas</string>
+    <string name="main_listaCategoriasBtn" >Categorias</string>
+    <string name="main_listarPlatosBtn">Platos</string>
+    <string name="main_listaOtrosBtn">Otros</string>
 
 </resources>

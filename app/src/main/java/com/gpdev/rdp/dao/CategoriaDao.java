@@ -1,13 +1,20 @@
 package com.gpdev.rdp.dao;
 
+import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.Property;
+import org.greenrobot.greendao.internal.SqlUtils;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
+import org.greenrobot.greendao.query.Query;
+import org.greenrobot.greendao.query.QueryBuilder;
+
+import com.gpdev.rdp.model.Plato;
 
 import com.gpdev.rdp.model.Categoria;
 
@@ -26,11 +33,12 @@ public class CategoriaDao extends AbstractDao<Categoria, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
         public final static Property Nombre = new Property(1, String.class, "nombre", false, "NOMBRE");
-        public final static Property Plato = new Property(2, String.class, "plato", false, "ID_PLATO");
+        public final static Property IdPlato = new Property(2, Long.class, "idPlato", false, "ID_PLATO");
     }
 
     private DaoSession daoSession;
 
+    private Query<Categoria> plato_CategoriasQuery;
 
     public CategoriaDao(DaoConfig config) {
         super(config);
@@ -55,9 +63,9 @@ public class CategoriaDao extends AbstractDao<Categoria, Long> {
             stmt.bindString(2, nombre);
         }
  
-        String plato = entity.getPlato();
-        if (plato != null) {
-            stmt.bindString(3, plato);
+        Long idPlato = entity.getIdPlato();
+        if (idPlato != null) {
+            stmt.bindLong(3, idPlato);
         }
     }
 
@@ -75,9 +83,9 @@ public class CategoriaDao extends AbstractDao<Categoria, Long> {
             stmt.bindString(2, nombre);
         }
  
-        String plato = entity.getPlato();
-        if (plato != null) {
-            stmt.bindString(3, plato);
+        Long idPlato = entity.getIdPlato();
+        if (idPlato != null) {
+            stmt.bindLong(3, idPlato);
         }
     }
 
@@ -97,7 +105,7 @@ public class CategoriaDao extends AbstractDao<Categoria, Long> {
         Categoria entity = new Categoria( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // nombre
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2) // plato
+            cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2) // idPlato
         );
         return entity;
     }
@@ -106,7 +114,7 @@ public class CategoriaDao extends AbstractDao<Categoria, Long> {
     public void readEntity(Cursor cursor, Categoria entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setNombre(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setPlato(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setIdPlato(cursor.isNull(offset + 2) ? null : cursor.getLong(offset + 2));
      }
     
     @Override
@@ -134,4 +142,110 @@ public class CategoriaDao extends AbstractDao<Categoria, Long> {
         return true;
     }
     
+    /** Internal query to resolve the "categorias" to-many relationship of Plato. */
+    public List<Categoria> _queryPlato_Categorias(Long idPlato) {
+        synchronized (this) {
+            if (plato_CategoriasQuery == null) {
+                QueryBuilder<Categoria> queryBuilder = queryBuilder();
+                queryBuilder.where(Properties.IdPlato.eq(null));
+                queryBuilder.orderRaw("T.'NOMBRE' ASC");
+                plato_CategoriasQuery = queryBuilder.build();
+            }
+        }
+        Query<Categoria> query = plato_CategoriasQuery.forCurrentThread();
+        query.setParameter(0, idPlato);
+        return query.list();
+    }
+
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getPlatoDao().getAllColumns());
+            builder.append(" FROM CATEGORIAS T");
+            builder.append(" LEFT JOIN PLATOS T0 ON T.\"ID_PLATO\"=T0.\"ID\"");
+            builder.append(' ');
+            selectDeep = builder.toString();
+        }
+        return selectDeep;
+    }
+    
+    protected Categoria loadCurrentDeep(Cursor cursor, boolean lock) {
+        Categoria entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        Plato plato = loadCurrentOther(daoSession.getPlatoDao(), cursor, offset);
+        entity.setPlato(plato);
+
+        return entity;    
+    }
+
+    public Categoria loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<Categoria> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<Categoria> list = new ArrayList<Categoria>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<Categoria> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<Categoria> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

@@ -3,7 +3,6 @@ package com.gpdev.rdp.view.activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,7 +22,6 @@ import com.gpdev.rdp.R;
 
 import com.gpdev.rdp.dao.DaoSession;
 import com.gpdev.rdp.model.RecetarioType;
-import com.gpdev.rdp.view.activity.dummy.DummyContent;
 import com.gpdev.rdp.view.adapter.ElementoListable;
 import com.gpdev.rdp.view.adapter.SimpleItemRecyclerViewAdapter;
 
@@ -31,8 +29,6 @@ import org.greenrobot.greendao.AbstractDao;
 
 import java.util.EnumMap;
 import java.util.List;
-
-import static com.gpdev.rdp.view.activity.RecetaDetailActivity.PARENT;
 
 /**
  * An activity representing a list of Recetas. This activity
@@ -46,11 +42,10 @@ public class RecetaListActivity extends AppCompatActivity {
 
     public static final String ARG_ITEM = "item"; //TODO usar una clase común para estos valores?
 
-    private EnumMap<RecetarioType, AbstractDao> daoMap;
-    private Toolbar toolbar;
-    private RecyclerView recyclerView;
     private EditText filterEditText;
     private SimpleItemRecyclerViewAdapter adapter;
+
+    private EnumMap<RecetarioType, AbstractDao> daoMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,27 +68,23 @@ public class RecetaListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void buildDaoMap() {
-        daoMap = new EnumMap<>(RecetarioType.class);
-        DaoSession daoSession = ((App) getApplication()).getDaoSession();
-
-        //daoMap.put(RecetarioType.PLATO, daoSession.getPlatoDao());
-        daoMap.put(RecetarioType.CATEGORIA, daoSession.getCategoriaDao());
-        daoMap.put(RecetarioType.RECETA, daoSession.getRecetaDao());
-    }
-
     private void initViewComponents() {
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        toolbar.setTitle(getTitle());
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        setUpFloatingButton();
         setupListView();
+        setUpListFilter();
+    }
 
-        filterEditText = findViewById(R.id.filterListEditText);
+    private void setUpListFilter() {
+        filterEditText = findViewById(R.id.buscarRecetaEditText);
         filterEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -110,8 +101,22 @@ public class RecetaListActivity extends AppCompatActivity {
         });
     }
 
+    private void setUpFloatingButton() {
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (filterEditText.isShown()){
+                    filterEditText.setVisibility(View.GONE);
+                    return;
+                }
+                filterEditText.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
     private void setupListView( ) {
-        recyclerView = findViewById(R.id.receta_list);
+        RecyclerView recyclerView = findViewById(R.id.receta_list);
 
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) {
@@ -120,9 +125,9 @@ public class RecetaListActivity extends AppCompatActivity {
 
         RecetarioType typeSelected = (RecetarioType) bundle.get(getString(R.string.ELEMENTO_SELECCIONADO));
         if (typeSelected != null) {
+            setTitle(typeSelected.getDescripcion());
             adapter = new SimpleItemRecyclerViewAdapter(RecetaListActivity.this, daoMap.get(typeSelected).loadAll());
             recyclerView.setAdapter(adapter);
-            setTitle(typeSelected.getLabel());
             return;
         }
 
@@ -131,7 +136,6 @@ public class RecetaListActivity extends AppCompatActivity {
             setTitle(elementSelected.getTitle());
             adapter = new SimpleItemRecyclerViewAdapter(this, getChildren(elementSelected));
             recyclerView.setAdapter(adapter);
-            setTitle(elementSelected.getTitle());
             return;
         }
     }
@@ -141,9 +145,12 @@ public class RecetaListActivity extends AppCompatActivity {
         return parent.getChilds();
     }
 
-    private void goToMain() {
-        Intent intent = new Intent(this, ListaRecetasActivity.class);
-        startActivity(intent);
-    }
+    private void buildDaoMap() {
+        daoMap = new EnumMap<>(RecetarioType.class);
+        DaoSession daoSession = ((App) getApplication()).getDaoSession();
 
+        daoMap.put(RecetarioType.PLATO, daoSession.getPlatoDao());
+        daoMap.put(RecetarioType.CATEGORIA, daoSession.getCategoriaDao());
+        daoMap.put(RecetarioType.RECETA, daoSession.getRecetaDao());
+    }
 }

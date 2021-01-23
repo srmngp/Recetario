@@ -45,6 +45,7 @@ public class DaoMaster extends AbstractDaoMaster {
         super(db, SCHEMA_VERSION);
         registerDaoClass(CategoriaDao.class);
         registerDaoClass(RecetaDao.class);
+        registerDaoClass(PlatoDao.class);
     }
 
     public DaoSession newSession() {

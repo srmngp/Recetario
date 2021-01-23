@@ -22,8 +22,8 @@ import java.util.stream.Collectors;
 
 public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> implements Filterable {
 
-    private final RecetaListActivity mParentActivity;
-    private final List<ElementoListable> elementList;
+    private RecetaListActivity mParentActivity;
+    private List<ElementoListable> elementList;
     private List<ElementoListable> filteredElementList;
 
     public SimpleItemRecyclerViewAdapter(RecetaListActivity parent, List<ElementoListable> items) {
@@ -41,27 +41,25 @@ public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleIt
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mIdView.setText(filteredElementList.get(position).getId().toString());
-        holder.mContentView.setText(filteredElementList.get(position).getTitle());
+        if (filteredElementList == null || filteredElementList.isEmpty()){
+            return;
+        }
+        
+        try {
 
-        holder.itemView.setTag(filteredElementList.get(position));
-        holder.itemView.setOnClickListener(buildOnClickListener(position));
+            holder.mIdView.setText(filteredElementList.get(position).getId().toString());
+            holder.mContentView.setText(filteredElementList.get(position).getTitle());
+
+            holder.itemView.setTag(filteredElementList.get(position));
+            holder.itemView.setOnClickListener(buildOnClickListener(position));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
     public int getItemCount() {
         return elementList.size();
-    }
-
-    class ViewHolder extends RecyclerView.ViewHolder {
-        final TextView mIdView;
-        final TextView mContentView;
-
-        ViewHolder(View view) {
-            super(view);
-            mIdView = view.findViewById(R.id.id_text);
-            mContentView = view.findViewById(R.id.content);
-        }
     }
 
     @Override
@@ -94,12 +92,23 @@ public class SimpleItemRecyclerViewAdapter extends RecyclerView.Adapter<SimpleIt
         };
     }
 
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final TextView mIdView;
+        final TextView mContentView;
+
+        ViewHolder(View view) {
+            super(view);
+            mIdView = view.findViewById(R.id.id_text);
+            mContentView = view.findViewById(R.id.content);
+        }
+    }
+
     private View.OnClickListener buildOnClickListener(final int position) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Context context = view.getContext();
-                ElementoListable item = elementList.get(position);
+                ElementoListable item = filteredElementList.get(position);
 
                 if (item.isParent()){
                      Intent intent = new Intent(mParentActivity.getBaseContext(), RecetaListActivity.class);

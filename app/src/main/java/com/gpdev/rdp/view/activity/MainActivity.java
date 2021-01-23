@@ -1,16 +1,15 @@
 package com.gpdev.rdp.view.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.gpdev.rdp.R;
 import com.gpdev.rdp.model.RecetarioType;
-import com.gpdev.rdp.view.adapter.ElementoListable;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,8 +19,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Intent intent;
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.listarRecetasBtn:
                 goToDetail(RecetarioType.RECETA);
                 break;
@@ -30,10 +28,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 goToDetail(RecetarioType.CATEGORIA);
                 break;
 
+            case R.id.listarPlatosBtn:
+                goToDetail(RecetarioType.PLATO);
+                break;
+
+            case R.id.scroll:
+                Intent intent = new Intent(MainActivity.this, ListaRecetasActivity.class);
+                startActivity(intent);
+                break;
+
             default:
                 break;
         }
     }
+
     private void goToDetail(RecetarioType type) {
         Intent intent = new Intent(MainActivity.this, RecetaListActivity.class);
         intent.putExtra(getString(R.string.ELEMENTO_SELECCIONADO), type);
